@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:replace = "fragments :: html_head" />
+
+    <title>Home page</title>
+<body>
+
+<h2 align="left" th:inline="text">Welcome, [[${#httpServletRequest.remoteUser}]] !</h2>
+
+
+<div class="container text-center">
+
+    <div>
+        <div>
+            <h1>Enterprise Resource Planning: </h1>
+
+            <form th:action="@{/logout}" method="post">
+                <input class="btn btn-primary" type="submit" value="Logout"/>
+            </form>
+
+        </div>
+
+        <div th:replace = "fragments :: menu" />
+
+
+        <br>
+        <a class="btn btn-primary" th:href="@{/customers/new}">Add new Customer</a>
+        <a class="btn btn-primary" th:href="@{/protocols/new}">Add new Protocol</a>
+        <a class="btn btn-primary" th:href="@{/users/register}">Add new User</a>
+        </br>
+
+
+    </div>
+</div>
+</body>
+</html>

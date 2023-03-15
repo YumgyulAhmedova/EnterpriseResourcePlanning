@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <title>Show List of All Protocols</title>
+</head>
+<body>
+
+<div>
+    <h1 class="text-white bg-dark font-italic">List All Protocols</h1>
+</div>
+
+
+<form th:action="@{/logout}" method="post">
+    <input class="btn btn-primary" type="submit" value="Logout"/>
+</form>
+
+<div class="container text-center">
+    <div><h2>Manage Protocols!</h2></div>
+
+
+    <div>&nbsp;</div>
+    <div>
+        <form th:action="@{/protocols/page/1}">
+            <input type="hidden" name="sortField" th:value="${sortField}"/>
+            <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+            Filter:
+            <input type="text" name="keyword" th:value="${keyword}" required/>
+            &nbsp;
+            <input type="submit" value="Search"/>
+            &nbsp;
+            <input type="button" value="Clear" onclick="clearFilter()"/>
+        </form>
+    </div>
+    <div>&nbsp;</div>
+
+    <h4><a th:href="@{/}">Go to the main menu</a></h4>
+    <h3>Total hours of work: <span th:text="${total}"></span></h3>
+
+    <div th:if="${message}" class="alert alert-success text-center">
+        [[${message}]]
+    </div>
+
+    <div class="table-responsive-sm">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Id
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=user.username&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Username
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=name&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Name
+                    </a>
+                </th>
+                <th>Hours</th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=customer.firstName&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Customer
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=customer.projectName&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Customer project name
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=customer.contractExpirationDate&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Customer contract expiration date
+                    </a>
+                </th>
+                <th>Description</th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=dateOfCreate&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Date of create
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/protocols/page/' + ${currentPage} + '?sortField=weekOfYear&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+                        Number of week
+                    </a>
+                </th>
+
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <a class="btn btn-primary" href="/customers">Go to Customers <i class="bi bi-arrow-right"></i></a>
+            <a class="btn btn-primary" href="/search">Go to Statistics <i class="bi bi-arrow-right"></i></a>
+
+            <th:block th:each="protocol : ${listProtocols}">
+                <tr>
+                    <td>[[${protocol.id}]]</td>
+                    <td>[[${protocol.user.username}]]</td>
+                    <td>[[${protocol.name}]]</td>
+                    <td>[[${protocol.hours}]]</td>
+                    <td>[[${protocol.customer.getFullName}]]</td>
+                    <td>[[${protocol.customer.projectName}]]</td>
+                    <td>[[${#dates.format(protocol.customer.contractExpirationDate, 'dd-MM-yyyy')}]]</td>
+                    <td>[[${protocol.description}]]</td>
+                    <td>[[${protocol.dateOfCreate}]]</td>
+                    <td>[[${protocol.weekOfYear}]]</td>
+
+                    <td>
+                        <a class="h5 mr-3" th:href="@{'/protocols/edit/' + ${protocol.id}}">Update</a>
+                        &nbsp;
+                        <a class="h5" th:href="@{'/protocols/delete/' + ${protocol.id}}">Delete</a>
+                    </td>
+
+
+                </tr>
+            </th:block>
+
+            </tbody>
+        </table>
+    </div>
+    <div>
+        Total items: [[${totalItems}]] - Page [[${currentPage}]] of [[${totalPages}]]
+        &nbsp; - &nbsp;
+
+        <a th:if="${currentPage > 1}"
+           th:href="@{'/protocols/page/1?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">First</a>
+        <span th:unless="${currentPage > 1}">First</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage > 1}"
+           th:href="@{'/protocols/page/' + ${currentPage - 1}  + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">Previous</a>
+        <span th:unless="${currentPage > 1}">Previous</span>
+        &nbsp;&nbsp;
+
+        <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+            <a th:if="${i != currentPage}"
+               th:href="@{'/protocols/page/' + ${i}} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}">[[${i}]]</a>
+            <span th:unless="${i != currentPage}">[[${i}]]</span>
+            &nbsp;&nbsp;
+        </span>
+
+        <a th:if="${currentPage < totalPages}"
+           th:href="@{'/protocols/page/' + ${currentPage + 1}  + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">Next</a>
+        <span th:unless="${currentPage < totalPages}">Next</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage < totalPages}"
+           th:href="@{'/protocols/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">Last</a>
+        <span th:unless="${currentPage < totalPages}">Last</span>
+        &nbsp;&nbsp;
+
+
+    </div>
+</div>
+<script type="text/javascript">
+    function clearFilter(){
+    window.location = '/protocols';
+}
+
+
+
+
+
+</script>
+</body>
+</html>

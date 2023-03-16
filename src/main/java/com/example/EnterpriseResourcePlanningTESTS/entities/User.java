@@ -41,6 +41,7 @@ public class User {
 
 
     public User() {
+
     }
 
 
@@ -114,6 +115,7 @@ public class User {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
 
 
     public List<Protocol> getProtocols() {

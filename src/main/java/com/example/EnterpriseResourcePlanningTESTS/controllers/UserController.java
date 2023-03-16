@@ -5,6 +5,7 @@ import com.example.EnterpriseResourcePlanningTESTS.enums.Role;
 import com.example.EnterpriseResourcePlanningTESTS.exceptions.UserNotFoundException;
 import com.example.EnterpriseResourcePlanningTESTS.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
-
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -31,13 +34,32 @@ public class UserController {
     }
 
 
+//    @PostMapping("/register/save")
+//    public ModelAndView saveUser(@Valid User user, RedirectAttributes redirectAttributes, BindingResult bindingResult, Model model) {
+//        if (bindingResult.hasErrors()) {
+//            model.addAttribute("bindingResult", bindingResult);
+//            return new ModelAndView("Users/register");
+//        } else {
+//            if (userDetailsService.isUsernameUnique(user.getUsername(), user.getId())) {
+//                bindingResult.rejectValue("username", "error", "The username is already taken!");
+//                return new ModelAndView("Users/register");
+//            }
+//            userDetailsService.saveUser(user);
+//            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!!!");
+//            return new ModelAndView("redirect:/users");
+//        }
+//    }
+
     @PostMapping("/register/save")
     public ModelAndView saveUser(@Valid User user, RedirectAttributes redirectAttributes, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("bindingResult", bindingResult);
             return new ModelAndView("Users/register");
-
         } else {
+            if (!userDetailsService.isUsernameUnique(user.getUsername(), user.getId())) {
+                bindingResult.rejectValue("username", "error", "The username is already taken!");
+                return new ModelAndView("Users/register");
+            }
             userDetailsService.saveUser(user);
             redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!!!");
             return new ModelAndView("redirect:/users");
